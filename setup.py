@@ -12,6 +12,6 @@ setup(
     install_requires=['pyyaml'],
     python_requires='>=3.7',
     entry_points={
-        'console_scripts': ['json_tools = json_tools:main']
+        'console_scripts': ['json_tools = json_tools.json_tools:main']
     }
 )
