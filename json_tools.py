@@ -3,6 +3,7 @@ import re
 import concurrent.futures
 from collections import defaultdict
 import os
+import argparse
 
 
 class JsonPath(object):
@@ -132,3 +133,11 @@ class Json(object):
             self._search(self.j, JsonPath(), res)
 
         return self.cache[pattern]
+
+
+def main():
+    pass
+
+
+if __name__ == "__main__":
+    main()
