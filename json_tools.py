@@ -32,6 +32,9 @@ class JsonPath(object):
     def __lt__(self, other):
         return self.res < other.res
 
+    def __len__(self):
+        return len(self.res)
+
 
 class _SearchResult(object):
     def __init__(self, pattern, verbose=True, match_path=True, title=""):
@@ -79,15 +82,16 @@ class _SearchResult(object):
                 sectionsep,
                 "Matched Keys",
                 sectionsep,
-                os.linesep.join(f"{path}.{key}" for path, key in sorted(self.matched_keys.items())),
+                os.linesep.join(f"{path}.{key}" if path else f"{key}"
+                                for path, key in sorted(self.matched_keys.items())),
                 sectionsep,
             )) if self.matched_keys else "",
             os.linesep.join((
                 sectionsep,
                 "Matched Values",
                 sectionsep,
-                os.linesep.join(f"{path}: {self.json_value_str(value)}" for path, value in
-                                sorted(self.matched_values.items())),
+                os.linesep.join(f"{path}: {self.json_value_str(value)}"
+                                for path, value in sorted(self.matched_values.items())),
                 sectionsep,
             )) if self.matched_values else "",
             os.linesep.join((
