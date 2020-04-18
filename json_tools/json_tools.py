@@ -6,6 +6,7 @@ import concurrent.futures
 from collections import defaultdict
 import os
 import argparse
+import yaml
 
 
 class JsonPath(object):
@@ -106,17 +107,23 @@ class _SearchResult(object):
 
 class Json(object):
     def __init__(self, j=None, file_path=None):
-        self.title = "json"
         if file_path:
             self.title = file_path
-            with open(file_path) as f:
-                self.j = json.load(f)
+            self.j = self._try_open_json(file_path)
         elif isinstance(j, str):
             self.title = f"json {j[:40]}..."
             self.j = json.loads(j)
         else:
             self.j = j
         self.cache = {}
+
+    @staticmethod
+    def _try_open_json(file_path):
+        try:
+            with open(file_path) as f:
+                return json.load(f)
+        except Exception as _:
+            return None
 
     def _search(self, node, path, res):
         res.match_path(path)
