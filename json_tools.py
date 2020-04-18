@@ -56,7 +56,7 @@ class _SearchResult(object):
 
     def match_key(self, key, path):
         if self.re.match(str(key)):
-            self._print(f"key {path} : {key}")
+            self._print(f"key {path}.{key}")
             self.matched_keys[path] = key
 
     def match_value(self, value, path):
@@ -79,7 +79,7 @@ class _SearchResult(object):
                 sectionsep,
                 "Matched Keys",
                 sectionsep,
-                os.linesep.join(f"{path} : {key}" for path, key in sorted(self.matched_keys.items())),
+                os.linesep.join(f"{path}.{key}" for path, key in sorted(self.matched_keys.items())),
                 sectionsep,
             )) if self.matched_keys else "",
             os.linesep.join((
@@ -138,7 +138,12 @@ class Json(object):
 
 
 def main():
-    pass
+    parser = argparse.ArgumentParser(description='Search for regexps in Json')
+    parser.add_argument("file_path", metavar="JSON_FILE_PATH", type=str, help="Path to json file")
+    parser.add_argument("reg_exp", metavar="REG_EXP", type=str, help="Regular expression to search")
+    args = parser.parse_args()
+    s = Json(file_path=args.file_path).search(args.reg_exp, verbose=False)
+    print(s)
 
 
 if __name__ == "__main__":
