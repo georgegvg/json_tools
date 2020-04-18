@@ -23,7 +23,7 @@ class JsonPath(object):
             return f".{s}"
 
         if self.res:
-            return str(self.res[0]) + ''.join(get_type(s) for s in self.res[1:])
+            return str(self.res[0]) + "".join(get_type(s) for s in self.res[1:])
         return ""
 
     def __hash__(self):
