@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='json_tools',
-    version='0.2',
+    version='0.3',
     packages=[''],
     url='https://github.com/georgegvg/json_tools',
     license='',

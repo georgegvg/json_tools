@@ -118,6 +118,14 @@ class Json(object):
         self.cache = {}
 
     @staticmethod
+    def _try_open_yaml(file_path):
+        try:
+            with open(file_path) as f:
+                return yaml.safe_load(f)
+        except Exception as _:
+            return None
+
+    @staticmethod
     def _try_open_json(file_path):
         try:
             with open(file_path) as f:
