@@ -59,7 +59,7 @@ class _SearchResult(object):
 
     def match_key(self, key, path):
         if self.re.match(str(key)):
-            self._print(f"key {path}.{key}")
+            self._print(f"key {path}.{key}" if path else f"{key}")
             self.matched_keys[path] = key
 
     def match_value(self, value, path):
