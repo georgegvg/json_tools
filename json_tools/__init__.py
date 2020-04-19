@@ -99,7 +99,7 @@ class _SearchResult(object):
                 sectionsep,
             )) if self.matched_keys else "",
             os.linesep.join((
-                "Matched Values",
+                "Matched Values (Path: value)",
                 sectionsep,
                 os.linesep.join(f"{path}: {self.json_value_str(value)}"
                                 for path, value in sorted(self.matched_values.items())),
