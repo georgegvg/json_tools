@@ -128,9 +128,7 @@ class JsonOrYaml(object):
 
     @classmethod
     def _try_open_file(cls, file_path, try_load_inner_jsons=True):
-        j = cls._try_open_json(file_path)
-        if not j:
-            j = cls._try_open_yaml(file_path)
+        j = cls._try_open_json(file_path) or cls._try_open_yaml(file_path)
         if not j:
             raise TypeError(f"the specified file {file_path} is not Json or Yaml")
         if try_load_inner_jsons:
@@ -152,15 +150,11 @@ class JsonOrYaml(object):
 
     @classmethod
     def _try_open_yaml(cls, file_path):
-        try:
-            with open(file_path) as f:
-                y = [i for i in yaml.load_all(f, Loader=SafeLoaderIgnoreUnknown)]
-                if len(y) == 1:
-                    return y[0]
-                else:
-                    return y
-        except Exception as e:
-            raise e
+        with open(file_path) as f:
+            y = [i for i in yaml.load_all(f, Loader=SafeLoaderIgnoreUnknown)]
+            if len(y) == 1:
+                return y[0]
+            return y
 
     @staticmethod
     def _try_open_json(file_path):
@@ -170,15 +164,16 @@ class JsonOrYaml(object):
         except Exception as _:
             return None
 
-    def _search(self, node, path, res):
+    @classmethod
+    def _search(cls, node, path, res):
         res.match_path(path)
         if isinstance(node, dict):
             for k, v in node.items():
                 res.match_key(k, path)
-                self._search(v, path + k, res)
+                cls._search(v, path + k, res)
         elif isinstance(node, list):
             for k, v in enumerate(node):
-                self._search(v, path + k, res)
+                cls._search(v, path + k, res)
         else:
             res.match_value(node, path)
 
@@ -220,7 +215,8 @@ def search_dir(path, args):
 
 def main():
     parser = argparse.ArgumentParser(description='Search for regexps in Json or yaml')
-    parser.add_argument("file_path", metavar="FILE_OR_DIR_PATH", type=str, help="Path to json or yaml file, or directory")
+    parser.add_argument("file_path", metavar="FILE_OR_DIR_PATH", type=str,
+                        help="Path to json or yaml file, or directory")
     parser.add_argument("reg_exp", metavar="REG_EXP", type=str, help="Regular expression to search")
     parser.add_argument("--verbose", action="store_true", help="show results on the fly")
     parser.add_argument("--disable_inner", action="store_true", help="disable parsing inner json strings")
