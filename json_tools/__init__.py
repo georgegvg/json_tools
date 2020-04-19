@@ -220,7 +220,7 @@ def search_dir(path, args):
 
 def main():
     parser = argparse.ArgumentParser(description='Search for regexps in Json or yaml')
-    parser.add_argument("file_path", metavar="JSON_FILE_PATH", type=str, help="Path to json file")
+    parser.add_argument("file_path", metavar="FILE_OR_DIR_PATH", type=str, help="Path to json or yaml file, or directory")
     parser.add_argument("reg_exp", metavar="REG_EXP", type=str, help="Regular expression to search")
     parser.add_argument("--verbose", action="store_true", help="show results on the fly")
     parser.add_argument("--disable_inner", action="store_true", help="disable parsing inner json strings")
