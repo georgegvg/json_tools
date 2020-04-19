@@ -30,7 +30,7 @@ Matched Keys
 glossary.title
 glossary.GlossDiv.title
 ----------------------------------------
-Matched Values
+Matched Values (Path: value)
 ----------------------------------------
 glossary.GlossDiv.GlossList.GlossEntry.Acronym: "SGML"
 glossary.GlossDiv.GlossList.GlossEntry.GlossDef.GlossSeeAlso[0]: "GML"
