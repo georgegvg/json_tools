@@ -7,6 +7,14 @@ import argparse
 import yaml
 
 
+class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+    def ignore_unknown(self, node):
+        return None
+
+
+SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+
+
 class JsonPath(object):
 
     def __init__(self, t=tuple()):
@@ -45,6 +53,11 @@ class _SearchResult(object):
         self.do_match_path = match_path
         self.pattern = pattern
         self.title = title
+
+    def __bool__(self):
+        if self.matched_keys or self.matched_values or self.matched_paths:
+            return True
+        return False
 
     @staticmethod
     def json_value_str(v):
@@ -143,9 +156,13 @@ class JsonOrYaml(object):
     def _try_open_yaml(cls, file_path):
         try:
             with open(file_path) as f:
-                return yaml.safe_load(f)
-        except Exception as _:
-            return None
+                y = [i for i in yaml.load_all(f, Loader=SafeLoaderIgnoreUnknown)]
+                if len(y) == 1:
+                    return y[0]
+                else:
+                    return y
+        except Exception as e:
+            raise e
 
     @staticmethod
     def _try_open_json(file_path):
@@ -178,6 +195,30 @@ class JsonOrYaml(object):
         return self.cache[pattern]
 
 
+def walk_serchable_files(path):
+    for subdir, dirs, files in os.walk(path):
+        for file in files:
+            if (file.endswith('.yaml') or
+                    file.endswith('.yml') or
+                    file.endswith('.json')):
+                yield os.path.join(subdir, file)
+
+
+def search_file(path, args):
+    joy = JsonOrYaml(file_path=path, try_load_inner_jsons=not args.disable_inner)
+    s = joy.search(args.reg_exp, verbose=args.verbose)
+    if s:
+        print(s)
+
+
+def search_dir(path, args):
+    for f in walk_serchable_files(path):
+        try:
+            search_file(f, args)
+        except Exception as _:
+            pass
+
+
 def main():
     parser = argparse.ArgumentParser(description='Search for regexps in Json or yaml')
     parser.add_argument("file_path", metavar="JSON_FILE_PATH", type=str, help="Path to json file")
@@ -185,6 +226,7 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="show results on the fly")
     parser.add_argument("--disable_inner", action="store_true", help="disable parsing inner json strings")
     args = parser.parse_args()
-    joy = JsonOrYaml(file_path=args.file_path, try_load_inner_jsons=not args.disable_inner)
-    s = joy.search(args.reg_exp, verbose=args.verbose)
-    print(s)
+    if os.path.isdir(args.file_path):
+        search_dir(args.file_path, args)
+    else:
+        search_file(args.file_path, args)
