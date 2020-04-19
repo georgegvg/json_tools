@@ -179,9 +179,12 @@ class JsonOrYaml(object):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Search for regexps in Json')
+    parser = argparse.ArgumentParser(description='Search for regexps in Json or yaml')
     parser.add_argument("file_path", metavar="JSON_FILE_PATH", type=str, help="Path to json file")
     parser.add_argument("reg_exp", metavar="REG_EXP", type=str, help="Regular expression to search")
+    parser.add_argument("--verbose", action="store_true", help="show results on the fly")
+    parser.add_argument("--disable_inner", action="store_true", help="disable parsing inner json strings")
     args = parser.parse_args()
-    s = JsonOrYaml(file_path=args.file_path).search(args.reg_exp, verbose=False)
+    joy = JsonOrYaml(file_path=args.file_path, try_load_inner_jsons=not args.disable_inner)
+    s = joy.search(args.reg_exp, verbose=args.verbose)
     print(s)
