@@ -105,11 +105,11 @@ class _SearchResult(object):
         ))
 
 
-class Json(object):
-    def __init__(self, j=None, file_path=None):
+class JsonOrYaml(object):
+    def __init__(self, j=None, file_path=None, try_load_inner_jsons=True):
         if file_path:
             self.title = file_path
-            self.j = self._try_open_json(file_path)
+            self.j = self._try_open_file(file_path, try_load_inner_jsons=try_load_inner_jsons)
         elif isinstance(j, str):
             self.title = f"json {j[:40]}..."
             self.j = json.loads(j)
@@ -117,8 +117,32 @@ class Json(object):
             self.j = j
         self.cache = {}
 
-    @staticmethod
-    def _try_open_yaml(file_path):
+    @classmethod
+    def _try_open_file(cls, file_path, try_load_inner_jsons=True):
+        j = cls._try_open_json(file_path)
+        if not j:
+            j = cls._try_open_yaml(file_path)
+        if not j:
+            raise TypeError(f"the specified file {file_path} is not Json or Yaml")
+        if try_load_inner_jsons:
+            return cls._try_load_inner_jsons(j)
+        return j
+
+    @classmethod
+    def _try_load_inner_jsons(cls, node):
+        if isinstance(node, dict):
+            return {k: cls._try_load_inner_jsons(v) for k, v in node.items()}
+        elif isinstance(node, list):
+            return [cls._try_load_inner_jsons(v) for v in node]
+        elif isinstance(node, str):
+            try:
+                return json.loads(node)
+            except Exception as _:
+                return node
+        return node
+
+    @classmethod
+    def _try_open_yaml(cls, file_path):
         try:
             with open(file_path) as f:
                 return yaml.safe_load(f)
@@ -161,7 +185,7 @@ def main():
     parser.add_argument("file_path", metavar="JSON_FILE_PATH", type=str, help="Path to json file")
     parser.add_argument("reg_exp", metavar="REG_EXP", type=str, help="Regular expression to search")
     args = parser.parse_args()
-    s = Json(file_path=args.file_path).search(args.reg_exp, verbose=False)
+    s = JsonOrYaml(file_path=args.file_path).search(args.reg_exp, verbose=False)
     print(s)
 
 
