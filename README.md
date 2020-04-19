@@ -13,3 +13,28 @@ json_tools FILE_OR_DIR_PATH REG_EXP
 
 if FILE_OR_DIR_PATH is a directory, all *.json, *.yaml and *.yml files in this directory and its subdirectories
 will be searched.
+
+## Output
+
+The search is structural, the output matches both keys and values, and returns the matched key or value, as well as the path to this key.
+
+### For Example
+
+```
+json_tools example.json ".*arkup*.| *.itle.*"
+
+----------------------------------------
+example.json
+Matched Keys
+----------------------------------------
+glossary.title
+glossary.GlossDiv.title
+----------------------------------------
+Matched Values
+----------------------------------------
+glossary.GlossDiv.GlossList.GlossEntry.GlossDef.para: "A meta-markup language, used to create markup languages such as DocBook."
+glossary.GlossDiv.GlossList.GlossEntry.GlossSee: "markup"
+glossary.GlossDiv.GlossList.GlossEntry.GlossTerm: "Standard Generalized Markup Language"
+----------------------------------------
+```
+
