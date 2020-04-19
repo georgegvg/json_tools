@@ -44,3 +44,8 @@ glossary.GlossDiv.GlossList.GlossEntry.SortAs: "SGML"
 ----------------------------------------
 ```
 
+## Limitations
+
+Some YAML files have a tricky structure, and currently cannot be parsed, 
+those files will be skipped during a directory search, or an explicit exception will be thrown
+if a single file is searched
