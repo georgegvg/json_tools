@@ -195,7 +195,7 @@ class JsonOrYaml(object):
         return self.cache[pattern]
 
 
-def walk_serchable_files(path):
+def walk_searchable_files(path):
     for subdir, dirs, files in os.walk(path):
         for file in files:
             if (file.endswith('.yaml') or
@@ -212,7 +212,7 @@ def search_file(path, args):
 
 
 def search_dir(path, args):
-    for f in walk_serchable_files(path):
+    for f in walk_searchable_files(path):
         try:
             search_file(f, args)
         except Exception as _:
