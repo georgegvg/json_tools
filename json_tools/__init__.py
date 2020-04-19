@@ -5,6 +5,9 @@ from collections import defaultdict
 import os
 import argparse
 import yaml
+import sys
+
+sectionsep = '-' * 40
 
 
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
@@ -85,7 +88,6 @@ class _SearchResult(object):
             self.matched_paths.add(path)
 
     def __str__(self):
-        sectionsep = '-' * 40
         return os.linesep.join((
             sectionsep,
             self.title,
@@ -212,7 +214,8 @@ def search_dir(path, args):
         try:
             search_file(f, args)
         except Exception as _:
-            pass
+            print(sectionsep, file=sys.stderr)
+            print(f"Cannot load {f}", file=sys.stderr)
 
 
 def main():
