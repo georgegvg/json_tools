@@ -56,6 +56,8 @@ class _SearchResult(object):
         self.do_match_path = match_path
         self.pattern = pattern
         self.title = title
+        self.matches_to_lines = []
+        self.current_match = 0
 
     def __bool__(self):
         if self.matched_keys or self.matched_values or self.matched_paths:
@@ -72,20 +74,34 @@ class _SearchResult(object):
         if self.verbose:
             print(s)
 
+    def _next_line_match(self):
+        if self.current_match < len(self.matches_to_lines):
+            self.current_match += 1
+            return self.matches_to_lines[self.current_match - 1]
+        return 0
+
     def match_key(self, key, path):
         if self.re.match(str(key)):
+            line = self._next_line_match()
+            self.current_match += 1
             self._print(f"key {path}.{key}" if path else f"{key}")
-            self.matched_keys[path] = key
+            self.matched_keys[path] = (line, key)
 
     def match_value(self, value, path):
         if self.re.match(str(value)):
+            line = self._next_line_match()
             self._print(f"value {path}: {self.json_value_str(value)}")
-            self.matched_values[path] = value
+            self.matched_values[path] = (line, value)
 
     def match_path(self, path):
         if self.do_match_path and self.re.match(str(path)):
             self._print(f"path {path}")
             self.matched_paths.add(path)
+
+    def match_line(self, line, line_num):
+        num_matches = len(self.re.findall(line))
+        if num_matches:
+            self.matches_to_lines.extend([line_num] * num_matches)
 
     def __str__(self):
         return os.linesep.join((
@@ -94,15 +110,15 @@ class _SearchResult(object):
             os.linesep.join((
                 "Matched Keys",
                 sectionsep,
-                os.linesep.join(f"{path}.{key}" if path else f"{key}"
-                                for path, key in sorted(self.matched_keys.items())),
+                os.linesep.join(f"{line}: {path}.{key}" if path else f"{key}"
+                                for path, (line, key) in sorted(self.matched_keys.items())),
                 sectionsep,
             )) if self.matched_keys else "",
             os.linesep.join((
                 "Matched Values (Path: value)",
                 sectionsep,
-                os.linesep.join(f"{path}: {self.json_value_str(value)}"
-                                for path, value in sorted(self.matched_values.items())),
+                os.linesep.join(f"{line}: {path}={self.json_value_str(value)}"
+                                for path, (line, value) in sorted(self.matched_values.items())),
                 sectionsep,
             )) if self.matched_values else "",
             os.linesep.join((
@@ -116,8 +132,9 @@ class _SearchResult(object):
 
 class JsonOrYaml(object):
     def __init__(self, j=None, file_path=None, try_load_inner_jsons=True):
+        self.file_path = ""
         if file_path:
-            self.title = file_path
+            self.file_path = self.title = file_path
             self.j = self._try_open_file(file_path, try_load_inner_jsons=try_load_inner_jsons)
         elif isinstance(j, str):
             self.title = f"json {j[:40]}..."
@@ -177,12 +194,20 @@ class JsonOrYaml(object):
         else:
             res.match_value(node, path)
 
+    @staticmethod
+    def _match_lines(file_name, res):
+        with open(file_name) as f:
+            for i, l in enumerate(f.readlines()):
+                res.match_line(l, i + 1)
+
     def search(self, pattern, override_cache=False, verbose=True, match_path=False):
         if override_cache or pattern not in self.cache:
             self.cache[pattern] = res = _SearchResult(pattern,
                                                       verbose=verbose,
                                                       match_path=match_path,
                                                       title=self.title)
+            if self.file_path:
+                self._match_lines(self.file_path, res)
             self._search(self.j, JsonPath(), res)
 
         return self.cache[pattern]
