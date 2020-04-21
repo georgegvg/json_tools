@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='json_tools',
-    version='0.4',
+    version='0.5',
     packages=['json_tools'],
     url='https://github.com/georgegvg/json_tools',
     license='',
@@ -12,6 +12,7 @@ setup(
     install_requires=['pyyaml'],
     python_requires='>=3.7',
     entry_points={
-        'console_scripts': ['json_tools = json_tools:main']
+        'console_scripts': ['search_json_yaml = json_tools:main',
+                            'check_json_validity = json_tools.check_json_validity:main']
     }
 )
