@@ -188,13 +188,13 @@ class JsonOrYaml(object):
         return self.cache[pattern]
 
 
-def walk_searchable_files(path):
+def walk_files(path, pattern):
+    path_re = re.compile(pattern)
     for subdir, dirs, files in os.walk(path):
         for file in files:
-            if (file.endswith('.yaml') or
-                    file.endswith('.yml') or
-                    file.endswith('.json')):
-                yield os.path.join(subdir, file)
+            full_path = os.path.join(subdir, file)
+            if path_re.match(full_path):
+                yield full_path
 
 
 def search_file(path, args):
@@ -205,7 +205,7 @@ def search_file(path, args):
 
 
 def search_dir(path, args):
-    for f in walk_searchable_files(path):
+    for f in walk_files(path, r".*\.yaml|.*\.json|.*\.yml"):
         try:
             search_file(f, args)
         except Exception as _:
