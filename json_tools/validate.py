@@ -1,4 +1,4 @@
-import json_tools
+from json_tools import SECTIONSEP, walk_files
 import argparse
 import json
 import os
@@ -11,14 +11,14 @@ def check_json_validity(path, args):
             json.load(f)
             return True
     except Exception as e:
-        print(json_tools.sectionsep)
+        print(SECTIONSEP)
         print(f"Failed to load {path} {e}")
         return False
 
 
 def check_validity(path, args):
     res = True
-    for f in json_tools.walk_files(path, r".*\.json"):
+    for f in walk_files(path, r".*\.json"):
         f_res = check_json_validity(f, args)
         res = res and f_res
     return res

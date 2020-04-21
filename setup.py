@@ -12,7 +12,7 @@ setup(
     install_requires=['pyyaml'],
     python_requires='>=3.7',
     entry_points={
-        'console_scripts': ['search_json_yaml = json_tools:main',
-                            'check_json_validity = json_tools.check_json_validity:main']
+        'console_scripts': ['search_json_yaml = json_tools.search:main',
+                            'check_json_validity = json_tools.validate:main']
     }
 )
