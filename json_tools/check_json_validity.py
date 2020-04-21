@@ -19,7 +19,8 @@ def check_json_validity(path, args):
 def check_validity(path, args):
     res = True
     for f in json_tools.walk_files(path, r".*\.json"):
-        res = res and check_json_validity(f, args)
+        f_res = check_json_validity(f, args)
+        res = res and f_res
     return res
 
 
