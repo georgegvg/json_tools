@@ -9,10 +9,17 @@ sudo python3 setup.py install
 
 ## Usage
 
-json_tools FILE_OR_DIR_PATH REG_EXP
+```search_json_yaml FILE_OR_DIR_PATH REG_EXP```
 
 if FILE_OR_DIR_PATH is a directory, all *.json, *.yaml and *.yml files in this directory and its subdirectories
 will be searched.
+
+```check_json_validity FILE_OR_DIR_PATH```
+
+if FILE_OR_DIR_PATH is a directory, all *.json files in this directory and its subdirectories
+will be validated.
+
+Will print the exception and return with error code if any of the jsons are malformed
 
 ## Output
 
@@ -21,7 +28,7 @@ The search is structural, the output matches both keys and values, and returns t
 ### For Example
 
 ```
-json_tools example.json ".*arkup*.| *.itle.*|.*ML.*"
+search_json_yaml example.json ".*arkup*.| *.itle.*|.*ML.*"
 
 ----------------------------------------
 example.json
