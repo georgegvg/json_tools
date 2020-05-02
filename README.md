@@ -1,6 +1,6 @@
 # json_tools
 
-* Search for a regular expressions in Json or Yaml files
+* Structural search for a regular expressions in Json or Yaml files
 
 * Validate Json files
 
