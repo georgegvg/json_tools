@@ -53,6 +53,14 @@ glossary.GlossDiv.GlossList.GlossEntry.SortAs: "SGML"
 ----------------------------------------
 ```
 
+```
+check_json_validity .
+
+----------------------------------------
+Failed to load ./example_malformed.json Expecting ',' delimiter: line 13 column 6 (char 335)
+Some Json are broken
+```
+
 ## Limitations
 
 Some YAML files have a tricky structure, and currently cannot be parsed, 
